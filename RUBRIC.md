@@ -1,41 +1,43 @@
-# INFT221 Final Project Rubric
+# INFT202 Final Project Rubric
 
 ## Overview
 
-Students choose a multi-table dataset, import it into PostgreSQL, write 8 SQL queries, and submit a working Flask web dashboard. Claude guides them through each step — but the SQL writing is theirs.
+Students choose a multi-table dataset, explore it, design a relational schema, import it into PostgreSQL, write 8 SQL queries, and submit a working Flask web dashboard. The AI assistant guides them through each step in small chunks, but the table-creation SQL and query SQL are the student's own work.
 
 **Total: 100 points**
 
 ---
 
-## 1. Dataset & Schema (20 pts)
+## 1. Data Exploration & Schema Design (25 pts)
 
 | Criteria | Points |
 |----------|--------|
-| Dataset has at least 2 related tables linked by a foreign key | 10 |
-| `schema.sql` has correct PostgreSQL types, primary keys, and at least one foreign key constraint | 5 |
-| Data successfully imported — tables have expected row counts | 5 |
+| Dataset has at least 2 related tables that can be linked together | 5 |
+| `data_exploration.md` shows thoughtful exploration of rows, columns, possible keys, categories, measurements, and data quality | 5 |
+| `schema_plan.md` explains the table design, column choices, data types, primary keys, and foreign key relationship | 5 |
+| `table_creation.sql` is student-written and uses appropriate PostgreSQL types, primary keys, and at least one foreign key constraint | 5 |
+| Data successfully imported - tables have expected row counts | 5 |
 
 ---
 
-## 2. Guided SQL Queries (40 pts — 6 queries × ~7 pts each, rounded)
+## 2. Guided SQL Queries (35 pts - 6 queries)
 
-Each query is saved as `queries/query_N.sql`. Claude guides the student but they write the SQL.
+Each query is saved as `queries/query_N.sql`. The assistant gives the prompt and hints, but the student writes and runs the SQL in Adminer or Beekeeper Studio before the final query is saved.
 
 | Query | Concept | Points |
 |-------|---------|--------|
-| Query 1 | `SELECT` + `WHERE` + `ORDER BY` + `LIMIT` — filter and sort | 6 |
-| Query 2 | `COUNT(*)` + `GROUP BY` — count by category | 7 |
-| Query 3 | `AVG`/`SUM`/`MIN`/`MAX` + `GROUP BY` — aggregate by category | 7 |
-| Query 4 | `GROUP BY` + `HAVING` — filter aggregated groups | 7 |
-| Query 5 | `JOIN` — combine both tables | 6 |
-| Query 6 | `JOIN` + `GROUP BY` + aggregate — the full combo | 7 |
+| Query 1 | `SELECT` + `WHERE` + `ORDER BY` + `LIMIT` - filter and sort | 5 |
+| Query 2 | `COUNT(*)` + `GROUP BY` - count by category | 6 |
+| Query 3 | `AVG`/`SUM`/`MIN`/`MAX` + `GROUP BY` - aggregate by category | 6 |
+| Query 4 | `GROUP BY` + `HAVING` - filter aggregated groups | 6 |
+| Query 5 | `JOIN` - combine both tables | 6 |
+| Query 6 | `JOIN` + `GROUP BY` + aggregate - the full combo | 6 |
 
 Grading each query: Full credit if the query runs, returns meaningful results, and uses the specified concept. Half credit if syntactically correct but doesn't answer the intended question. Zero if it doesn't run.
 
 ---
 
-## 3. Discussion Queries (20 pts — 2 queries × 10 pts each)
+## 3. Discussion Queries (20 pts - 2 queries x 10 pts each)
 
 Saved in `discussion/discussion_1.sql` and `discussion/discussion_2.sql`.
 
@@ -50,7 +52,7 @@ Saved in `discussion/discussion_1.sql` and `discussion/discussion_2.sql`.
 
 | Criteria | Points |
 |----------|--------|
-| App runs with `python app.py` and connects to PostgreSQL | 5 |
+| App runs with Docker and connects to PostgreSQL | 5 |
 | Dashboard page shows at least 2 summary stats and 1 Chart.js chart | 5 |
 | Browse page shows paginated data | 5 |
 | Insights page shows discussion query results with student's explanations | 5 |
@@ -66,14 +68,16 @@ Saved in `discussion/discussion_1.sql` and `discussion/discussion_2.sql`.
 
 ---
 
-## What Claude handles vs. what the student handles
+## What The Assistant Handles vs. What The Student Handles
 
-| Claude handles | Student handles |
+| Assistant handles | Student handles |
 |---------------|-----------------|
-| Schema generation | Running the schema in Beekeeper Studio |
+| Data exploration prompts and summaries | Discussing what the data means and what looks important |
+| Schema design guidance | Choosing primary keys, foreign keys, and table relationships |
+| `schema_plan.md` and a `table_creation.sql` worksheet | Writing and running the actual `CREATE TABLE` commands |
 | Import commands | Running the import, troubleshooting row count issues |
-| Hints and explanations | Writing every `.sql` file |
+| Hints and explanations | Writing and running every graded SQL query in Adminer or Beekeeper Studio |
 | Entire Flask web app | Configuring `.env`, running the server, testing it |
 | README template | Filling in their dataset description and query explanations |
 
-The SQL files in `queries/` and `discussion/` are the primary academic deliverable. Claude guides but doesn't write them.
+The table-creation file, SQL files in `queries/`, and SQL files in `discussion/` are primary academic deliverables. The assistant guides but does not write them.

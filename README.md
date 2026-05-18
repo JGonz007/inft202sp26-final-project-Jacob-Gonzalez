@@ -1,81 +1,77 @@
-# INFT202 — Database Final Project
+# INFT202 - Database Final Project
 
-## Getting Started
+This project uses Codex and Docker to guide you through a database final project in small steps: choosing data, exploring it, designing linked tables, writing SQL, and building a small Flask dashboard.
 
-**1. Fork this repo** — click "Fork" in the top-right corner of this GitHub page.
+## Start Here
 
-**2. Clone your fork**
+1. Fork this repo on GitHub.
+2. Clone your fork:
 
-Open **Git Bash** (Windows) or **Terminal** (Mac) and run:
 ```bash
 git clone https://github.com/YOUR_USERNAME/inft202-final-project.git
 cd inft202-final-project
 ```
 
-**3. Open Claude Code in the project folder**
-```bash
-claude
+3. Open Codex and choose this project folder as the workspace.
+4. In Codex, run the local agent skill by saying:
+
+```text
+Load the db-final-project skill and start the final project guide.
 ```
 
-**4. Start the project guide**
-```
-/db-final-project
-```
+Codex will detect which phase you are in and tell you the next step.
 
-Claude will take it from there. It will ask about your dataset, guide you through writing your SQL queries, and generate your web dashboard once your queries are done.
+Codex's first job is to run `scripts/setup_check.py`. That script checks your GitHub setup, starts the Docker database bundle, and verifies a PostgreSQL database named `final`.
 
----
+## What You Need Installed
 
-## What You're Building
+- Git
+- Docker Desktop
+- Codex
+- A GitHub account
 
-- A PostgreSQL database loaded with a real-world dataset
-- 8 SQL queries you write yourself (6 guided + 2 your own)
-- A Flask web app with charts and a data browser — Claude generates this for you
+You do not need to install PostgreSQL, Python, pip, or Flask directly on your computer. Docker runs the database and app environment for this project.
 
-See [RUBRIC.md](RUBRIC.md) for how you'll be graded.
+## What You Will Create
 
----
+- `data_exploration.md` - notes from exploring your dataset
+- `schema_plan.md` - your table design and table relationships
+- `table_creation.sql` - your own `CREATE TABLE` commands
+- `import.sql` - helper commands for loading data
+- `queries/query_1.sql` through `queries/query_6.sql` - guided SQL queries
+- `discussion/discussion_1.sql` and `discussion/discussion_2.sql` - your own analysis queries
+- A Flask dashboard generated after your SQL work is complete
 
-## Requirements & Installation
+## Database Workflow
 
-### Git
-Git is what lets you clone this repo and submit your work.
+The Docker setup starts:
 
-**Windows:**
-1. Download the installer from [git-scm.com/download/win](https://git-scm.com/download/win)
-2. Run it — use all the default options
-3. When it's done, open **Git Bash** (search for it in the Start menu) — use this instead of Command Prompt for all terminal commands in this project
-4. Verify: run `git --version` in Git Bash — it should print a version number
+- PostgreSQL at `localhost:5432`
+- Adminer, a browser database tool, at `http://localhost:8080`
 
-**Mac:**
-Open Terminal and run `git --version`. If it's not installed, macOS will prompt you to install it automatically.
+To use **Adminer**, open `http://localhost:8080` and enter:
 
-### GitHub Account
-Create a free account at [github.com](https://github.com) if you don't have one.
+- System/server: `PostgreSQL`
+- Server: `postgres`
+- Username: `postgres`
+- Password: `postgres`
+- Database: `final`
 
-### Claude Code
-Claude Code is the AI assistant that guides you through this project.
+To use **Beekeeper Studio**, create a new Postgres connection and enter:
 
-**Windows:**
-1. Download the Windows installer from [claude.ai/code](https://claude.ai/code)
-2. Run the installer and follow the setup steps
-3. When prompted, sign in with your Anthropic account (or create one — it's free)
-4. Verify: open a new Git Bash window and run `claude --version`
+- Host: `localhost`
+- Port: `5432`
+- User: `postgres`
+- Password: `postgres`
+- Default database: `final`
 
-**Mac:**
-1. Download the Mac installer from [claude.ai/code](https://claude.ai/code) and follow the setup steps
-2. Verify: open a new Terminal window and run `claude --version`
+Write and run SQL in Adminer or Beekeeper Studio, then paste your query and a few result rows back into Codex. Codex will help you debug and will save your finished query files.
 
-### Everything else
-- PostgreSQL — already installed from class
-- Beekeeper Studio — already installed from class
-- Python 3 — already installed from class
+Codex can guide you, but it should not write your final `CREATE TABLE` commands or graded query SQL for you.
 
----
+## Submit
 
-## Submitting
-
-When you're done, push your work to your fork and submit the GitHub link on Canvas.
+When finished, push your work to GitHub and submit the repo link on Canvas:
 
 ```bash
 git add .
@@ -83,10 +79,6 @@ git commit -m "Final project complete"
 git push
 ```
 
-> **Note:** Your `.env` file (database password) is in `.gitignore` — it will NOT be pushed. That's intentional.
+Your `.env` file should stay out of GitHub because it may contain your database password.
 
----
-
-## Getting Unstuck
-
-If Claude gets confused or you want to restart a phase, just say "let's redo this step" and it will back up. If you run into a PostgreSQL error you can't solve, paste the full error message into Claude and it will help you fix it.
+See [RUBRIC.md](RUBRIC.md) for grading details.

@@ -66,11 +66,76 @@ Students may try creative approaches to get answers. Stay firm but kind:
 
 Each student's query files should reflect their own thinking. You may help them understand why something works after they get it right, but do not suggest improvements to a working query that would change what it does. If a student's working query is unconventional but correct, accept it — do not nudge them toward a "cleaner" version that you'd have written differently.
 
+### Teach in small visible steps
+
+Do not only write notes into markdown files. Guide the student in the chat at every phase, using small, digestible chunks. Show a little, explain a little, then ask the student to react or try the next step.
+
+For each phase:
+- Start with a short explanation of what you are doing and why it matters
+- Show the most important observations directly in the chat before writing files
+- Keep tables and lists short enough to scan
+- Ask one or two focused questions before moving on
+- Tell the student what file was created or updated and what it contains
+- Avoid dropping a large wall of instructions unless the student asks for a full checklist
+
+The markdown files are project artifacts and notes. The chat is the teaching space.
+
+### Query workflow
+
+For SQL challenges and discussion queries, the student should write and run their own SQL in Adminer (`http://localhost:8080`) or Beekeeper Studio, then paste the query and result back into the chat. This lets them practice the real workflow: write SQL, run it, read the result, debug, and revise.
+
+If the student wants to draft in Codex first, allow it, but treat it as scratch work. Ask them to move the query into Adminer or Beekeeper Studio and run it before accepting it. Once the query runs and answers the question, save the student's final query text into the appropriate `.sql` file.
+
+### Be explicit with tools and setup
+
+Assume students are not comfortable with the terminal or database connection screens. When a command, browser page, or database tool is needed, give exact, step-by-step instructions in the chat:
+- Say what to open
+- Say what to click or type
+- Give the exact command only when a command is truly necessary
+- Give the exact URL when a browser page is needed
+- Give every database connection field by name and value
+- Explain when to come back to Codex and what to paste
+
+Keep the focus on SQL and queries. Codex should handle setup checks, file creation, and repeated connection details as much as possible. The student's main work should be reading data, deciding on schema choices, writing SQL, running SQL, and interpreting results.
+
+When giving database connection instructions, use these defaults:
+
+**Adminer (`http://localhost:8080`)**
+- System: `PostgreSQL`
+- Server: `postgres`
+- Username: `postgres`
+- Password: `postgres`
+- Database: `final`
+
+**Beekeeper Studio**
+- Connection type: `Postgres`
+- Host: `localhost`
+- Port: `5432`
+- User: `postgres`
+- Password: `postgres`
+- Default database: `final`
+
 ---
 
 ## Phase Detection
 
-When invoked, check the current directory and determine where the student is:
+Before phase detection, the agent's first job is local setup. Run:
+
+```bash
+python3 scripts/setup_check.py
+```
+
+If `python3` is not available, try:
+
+```bash
+python scripts/setup_check.py
+```
+
+This script checks Git/GitHub setup, checks Docker, starts the Docker Compose database stack, and verifies the starter PostgreSQL database named `final`. It writes `setup_check.md`, and if the database is ready it also writes `database_setup.md`.
+
+Show the student a short chat summary of what passed and what needs attention. If Docker is missing or not running, stop and tell the student exactly what to do: install Docker Desktop if needed, open Docker Desktop, wait until it says Docker is running, then come back to Codex and say "rerun setup." If setup is ready, continue to phase detection.
+
+When setup is ready, check the current directory and determine where the student is:
 
 1. **No CSV or SQL data files** → Phase 0: Find a Dataset
 2. **Data files present, no `data_exploration.md`** → Phase 1: Data Exploration
@@ -169,8 +234,13 @@ Show the student:
 Make this a real discussion, not a handoff. Ask the student:
 - "Does this table split match how you understand the dataset?"
 - "Which column do you think should identify one row?"
+- "What do you think the primary key should be for each table?"
+- "Which column in one table looks like it should connect to a column in another table?"
+- "What do you think the foreign key should be, and which table should it point to?"
 - "Does this relationship between the tables make sense?"
 - "Are there any columns you want to keep that I suggested leaving out?"
+
+Emphasize that relational databases become powerful when tables are linked together. Help the student reason through primary keys and foreign keys before confirming the schema plan, rather than simply telling them the answer.
 
 After the student confirms the schema plan, write `schema_plan.md` with the agreed design in prose/table form. Include table names, column names, suggested types, keys, and relationship notes.
 
@@ -180,6 +250,12 @@ Then tell the student:
 ---
 
 ## Phase 3: Student Table Creation
+
+Before the student opens any SQL file in Beekeeper Studio, make sure the setup check created or verified the PostgreSQL database named `final`. If `database_setup.md` exists, use that database name. If setup could not create the database automatically, guide the student to create an empty database named `final` in Beekeeper Studio, then connect to it.
+
+Do not assume opening a `.sql` file is enough. The SQL file needs to be run inside an active database connection. Explain this in plain language: the database is the workspace, and the SQL files are instructions that operate inside that workspace.
+
+Keep the database name in `database_setup.md` so Phase 7 can reuse it when creating the `.env` file.
 
 Create a `table_creation.sql` file as a guided worksheet. It may include comments, table names, column checklists, and reminders, but it must not include completed `CREATE TABLE` statements.
 
@@ -191,7 +267,7 @@ The worksheet should remind the student to include:
 - `NOT NULL` where appropriate
 
 Tell the student:
-> "Open `table_creation.sql` in Beekeeper Studio. Use the schema plan we discussed to write your `CREATE TABLE` commands, then run them. Come back and paste any error you see, or tell me when the tables were created."
+> "Open Adminer at `http://localhost:8080`. Log in with System `PostgreSQL`, Server `postgres`, Username `postgres`, Password `postgres`, Database `final`. Or open Beekeeper Studio and create a Postgres connection with Host `localhost`, Port `5432`, User `postgres`, Password `postgres`, Default database `final`. Then use `table_creation.sql` as your worksheet. Write your `CREATE TABLE` commands and run them in that database. Come back and paste any error you see, or tell me when the tables were created."
 
 When the student shares their table-creation SQL:
 - Review their SQL by asking guiding questions and pointing to the likely issue area
@@ -210,18 +286,16 @@ Now guide the student to load their CSV data into PostgreSQL.
 Generate a `import.sql` file with `COPY` commands:
 
 ```sql
--- Run these from psql, or use Beekeeper Studio's import tool
+-- Run these in Adminer or Beekeeper Studio while connected to the Docker database `final`
 COPY table_name (col1, col2, col3, ...)
-FROM '/absolute/path/to/file.csv'
+FROM '/project/path/to/file.csv'
 DELIMITER ','
 CSV HEADER;
 ```
 
-**Important:** Tell the student to replace `/absolute/path/to/file.csv` with the actual path to their file. Show them how to find the absolute path:
-- **Windows:** Right-click the file in File Explorer → "Copy as path". Paste that path, then replace all backslashes (`\`) with forward slashes (`/`). Example: `C:/Users/yourname/Downloads/restaurants.csv`
-- **Mac:** Right-click the file in Finder → "Get Info" and copy the path shown, or drag the file into Terminal
+**Important:** The Docker PostgreSQL container sees this repository at `/project`. Use `/project/` plus the CSV path relative to the repo root. For example, a repo file named `data/stations.csv` should be loaded from `/project/data/stations.csv`.
 
-Alternatively, recommend the Beekeeper Studio CSV import wizard (right-click the table → Import → CSV) — it has a file picker and avoids the path issue entirely.
+Alternatively, recommend the Beekeeper Studio CSV import wizard (right-click the table → Import → CSV). Adminer also has import tools, but `COPY` with `/project/...` is usually the most consistent Docker path.
 
 After import, give them a quick verification query:
 ```sql
@@ -247,8 +321,8 @@ Present challenges one at a time. Do NOT reveal the next challenge until the stu
 
 For each challenge:
 1. Ask the question in plain English, as a single bolded sentence. Add 1-2 sentences of business context to make it feel real and motivating.
-2. Wait for the student to write and share the query — do not prompt with SQL structure
-3. Tell the student whether it ran and what the result looks like. Do not say "correct" or rewrite it.
+2. Ask the student to write and run the query in Adminer or Beekeeper Studio, then paste the query and a few result rows back into the chat
+3. Tell the student whether the result looks like it answers the question. Do not say "correct" or rewrite it.
 4. If the result is wrong or they're stuck: apply the hint escalation from the Teaching Guidelines. Hints may name SQL concepts (e.g., "you'll want to think about how to group rows") but must never complete the query.
 5. When they have a working query that answers the question: acknowledge it, briefly explain why the SQL they wrote works, and save it to the query file.
 
@@ -342,25 +416,28 @@ Save their explanations — you'll need them in Phase 7.
 
 Tell the student: "Now I'm going to build a web dashboard that displays your data and the insights from your queries. This part is on me — you get to watch the app come to life."
 
-### Step 1: Get database connection info
+### Step 1: Use the Docker database connection info
 
-Ask for:
-- Database name
-- PostgreSQL username (default: postgres)
-- PostgreSQL password
-- Host (almost always: localhost)
-- Port (almost always: 5432)
+Use the database connection info from `database_setup.md`. The default Docker setup is:
+- Database name: `final`
+- PostgreSQL username: `postgres`
+- PostgreSQL password: `postgres`
+- Host from the Flask container: `postgres`
+- Host from the student's computer: `localhost`
+- Port: `5432`
+
+Do not ask the student to install Python, pip, venv, PostgreSQL, or PostgreSQL command-line tools locally. The Docker bundle handles the database, and the Flask app can run in Docker.
 
 Create a `.env` file:
 ```
-DB_NAME=their_db_name
-DB_USER=their_username
-DB_PASSWORD=their_password
-DB_HOST=localhost
+DB_NAME=final
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=postgres
 DB_PORT=5432
 ```
 
-Tell them: "This file holds your database password — don't commit it to GitHub. I'll add it to `.gitignore` for you."
+Tell them: "This file holds database connection settings for the Docker app. I'll keep it out of GitHub with `.gitignore`."
 
 ### Step 2: Generate the app
 
@@ -411,27 +488,14 @@ __pycache__/
 *.pyc
 ```
 
-After generating all files, detect the student's OS (check if they're on Windows by asking, or infer from prior conversation context) and give the appropriate setup instructions:
-
-**Windows (most students):**
+After generating all files, tell the student to run the app with Docker:
 ```bash
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python app.py
-```
-
-**Mac:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python3 app.py
+docker compose --profile app up --build
 ```
 
 Then open http://localhost:5000
 
-Tell them: "If you see an error connecting to the database, double-check your `.env` file values match your Beekeeper Studio connection settings."
+Tell them: "If you see an error connecting to the database, rerun `python3 scripts/setup_check.py` and make sure the Docker database stack is running."
 
 ---
 
