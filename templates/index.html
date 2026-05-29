@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Popular People Dashboard{% endblock %}
+
+{% block content %}
+<h1>Popular People Dashboard</h1>
+<p class="lead">A database view of people, departments, and popularity scores.</p>
+
+<section class="grid stats">
+    <div class="card">
+        <div class="stat-label">Total People</div>
+        <div class="stat-value">{{ "{:,}".format(stats.total_people) }}</div>
+    </div>
+    <div class="card">
+        <div class="stat-label">Departments</div>
+        <div class="stat-value">{{ stats.total_departments }}</div>
+    </div>
+    <div class="card">
+        <div class="stat-label">Avg Popularity</div>
+        <div class="stat-value">{{ stats.avg_popularity }}</div>
+    </div>
+    <div class="card">
+        <div class="stat-label">Popularity Above 10</div>
+        <div class="stat-value">{{ stats.high_popularity }}</div>
+    </div>
+</section>
+
+<section class="grid charts">
+    <div class="card">
+        <h2>People by Department</h2>
+        <div class="chart-box">
+            <canvas id="countChart"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Average Popularity by Department</h2>
+        <div class="chart-box">
+            <canvas id="averageChart"></canvas>
+        </div>
+    </div>
+</section>
+
+<script>
+    const countLabels = {{ count_by_department | map(attribute="department_name") | list | tojson }};
+    const countValues = {{ count_by_department | map(attribute="total_people") | list | tojson }};
+    const averageLabels = {{ avg_by_department | map(attribute="department_name") | list | tojson }};
+    const averageValues = {{ avg_by_department | map(attribute="average_popularity") | list | tojson }};
+
+    const colors = ["#005DAA", "#F26822", "#0C2255", "#5B8DEF", "#FDBA74", "#4B5563", "#1F9D8A", "#9A3412", "#2563EB", "#64748B"];
+
+    new Chart(document.getElementById("countChart"), {
+        type: "bar",
+        data: {
+            labels: countLabels,
+            datasets: [{
+                label: "People",
+                data: countValues,
+                backgroundColor: colors
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    new Chart(document.getElementById("averageChart"), {
+        type: "bar",
+        data: {
+            labels: averageLabels,
+            datasets: [{
+                label: "Average popularity",
+                data: averageValues,
+                backgroundColor: colors
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+{% endblock %}

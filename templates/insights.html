@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Insights{% endblock %}
+
+{% block content %}
+<h1>Insights</h1>
+<p class="lead">Two student-selected questions about popularity scores in the dataset.</p>
+
+{% for insight in insights %}
+<section class="card section">
+    <h2>{{ insight.question }}</h2>
+    <div class="callout">{{ insight.explanation }}</div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    {% for column in insight.rows[0].keys() %}
+                    <th>{{ column.replace("_", " ").title() }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in insight.rows %}
+                <tr>
+                    {% for value in row.values() %}
+                    <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endfor %}
+{% endblock %}

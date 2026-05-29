@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Browse People{% endblock %}
+
+{% block content %}
+<h1>Browse People</h1>
+<p class="lead">{{ "{:,}".format(total) }} matching people, sorted by popularity.</p>
+
+<form class="search-row" method="get" action="/browse">
+    <input type="search" name="q" value="{{ search }}" placeholder="Search by name">
+    <button type="submit">Search</button>
+</form>
+
+<div class="card table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Original Name</th>
+                <th>Gender</th>
+                <th>Popularity</th>
+                <th>Department</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.people_id }}</td>
+                <td>{{ row.name }}</td>
+                <td>{{ row.original_name }}</td>
+                <td>{{ row.gender }}</td>
+                <td>{{ row.popularity }}</td>
+                <td>{{ row.department_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="pager">
+    {% if page > 1 %}
+    <a class="button secondary" href="/browse?page={{ page - 1 }}&q={{ search }}">Previous</a>
+    {% else %}
+    <span></span>
+    {% endif %}
+    <strong>Page {{ page }} of {{ pages }}</strong>
+    {% if page < pages %}
+    <a class="button secondary" href="/browse?page={{ page + 1 }}&q={{ search }}">Next</a>
+    {% else %}
+    <span></span>
+    {% endif %}
+</div>
+{% endblock %}

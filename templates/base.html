@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Popular People Dashboard{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --navy: #0C2255;
+            --blue: #005DAA;
+            --orange: #F26822;
+            --ink: #172033;
+            --muted: #647084;
+            --line: #d9e1ef;
+            --soft: #f5f7fb;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            background: var(--soft);
+            color: var(--ink);
+        }
+
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--navy);
+            color: var(--white);
+            border-bottom: 4px solid var(--orange);
+        }
+
+        .nav-inner {
+            max-width: 920px;
+            margin: 0 auto;
+            min-height: 64px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand {
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 700;
+            padding: 9px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 28px 20px 48px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            color: var(--navy);
+            font-size: 32px;
+            line-height: 1.15;
+        }
+
+        h2 {
+            margin: 0 0 14px;
+            color: var(--navy);
+            font-size: 20px;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        .lead {
+            color: var(--muted);
+            margin: 0 0 24px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .stats {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            margin-bottom: 18px;
+        }
+
+        .charts {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 8px 20px rgba(12, 34, 85, 0.06);
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: var(--blue);
+            font-size: 30px;
+            font-weight: 800;
+        }
+
+        .chart-box {
+            height: 320px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+        }
+
+        th, td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+            vertical-align: top;
+            font-size: 14px;
+        }
+
+        th {
+            color: var(--navy);
+            background: #edf3fb;
+            font-weight: 800;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+            margin: 0 0 16px;
+        }
+
+        input[type="search"] {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 11px 12px;
+            font: inherit;
+        }
+
+        button, .button {
+            border: 0;
+            border-radius: 6px;
+            background: var(--blue);
+            color: var(--white);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            padding: 11px 14px;
+            text-decoration: none;
+        }
+
+        .button.secondary {
+            background: var(--navy);
+        }
+
+        .pager {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .callout {
+            border-left: 5px solid var(--orange);
+            background: #fff7f1;
+            padding: 12px 14px;
+            border-radius: 6px;
+            margin: 0 0 16px;
+        }
+
+        .section {
+            margin-top: 22px;
+        }
+
+        @media (max-width: 760px) {
+            .nav-inner {
+                align-items: flex-start;
+                flex-direction: column;
+                padding-top: 14px;
+                padding-bottom: 14px;
+            }
+
+            .stats, .charts {
+                grid-template-columns: 1fr;
+            }
+
+            .search-row, .pager {
+                align-items: stretch;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <div class="brand">Popular People</div>
+            <div class="nav-links">
+                <a href="/">Dashboard</a>
+                <a href="/browse">Browse</a>
+                <a href="/insights">Insights</a>
+            </div>
+        </div>
+    </nav>
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
